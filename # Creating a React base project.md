@@ -50,7 +50,6 @@ Add `index.html` to `public` directory
 ## Babel
 
 Run `yarn add -D @babel/core @babel/cli @babel/preset-env @babel/preset-react`
-This line was copied from a 2018 article, there is probaly a more evergreen solution. Also need to change npm to yarn.
 
 In the root, create a file `.babelrc` with:
 
@@ -59,45 +58,47 @@ In the root, create a file `.babelrc` with:
 ## Webpack
 
 Run `yarn add -D webpack webpack-cli webpack-dev-server style-loader css-loader babel-loader`
-This line was copied from a 2018 article, there is probaly a more evergreen solution. Also need to change npm to yarn.
 
 In the root, create a file `webpack.config.js` with:
 
 ```javascript
 const path = require("path");
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  entry: "./src/index.js",
-  mode: "development",
+  entry: path.resolve(__dirname, "./src/index.js"),
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: "babel-loader",
-        options: { presets: ["@babel/env"] },
+        exclude: /node_modules/,
+        use: ["babel-loader"],
       },
       {
         test: /\.css$/,
+        exclude: /node_modules/,
         use: ["style-loader", "css-loader"],
       },
     ],
   },
-  resolve: { extensions: ["*", ".js", ".jsx"] },
+  resolve: {
+    extensions: ["*", ".js", ".jsx"],
+  },
   output: {
-    path: path.resolve(__dirname, "dist/"),
-    publicPath: "/dist/",
+    path: path.resolve(__dirname, "./dist"),
     filename: "bundle.js",
   },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({ template: "./public/index.html" }),
+  ],
   devServer: {
-    contentBase: path.join(__dirname, "public/"),
-    port: 3000,
-    publicPath: "http://localhost:3000/dist/",
-    hotOnly: true,
+    contentBase: path.resolve(__dirname, "./dist"),
+    hot: true,
   },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
 };
+
 ```
 
 ## React
@@ -107,29 +108,33 @@ Add the packages `react` and `react-dom` and save as regular dependencies
 Add `index.js` in `src` directory with:
 
 ```javascript
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App.js";
-ReactDOM.render(<App />, document.getElementById("root"));
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App.js';
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+module.hot.accept();
 ```
 
 Add `App.js` in `src` directory with:
 
 ```javascript
 import React, { Component } from "react";
+import { hot } from "react-hot-loader";
 import "./App.css";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <h1> Hello, World! </h1>
+        <h1> Hello, World!</h1>
       </div>
     );
   }
 }
 
-export default App;
+export default hot(module)(App);
 ```
 
 Add `App.css` in `src` directory with:
@@ -141,9 +146,9 @@ Add `App.css` in `src` directory with:
 }
 ```
 
-## Last detail
+## React Hot Loader
 
-This [Article](https://blog.usejournal.com/creating-a-react-app-from-scratch-f3c693b84658) sugestes using `react-hot-loader` to tell HRM how to update our client. But I have no idea what is so I`m skiping this step for now.
+Run `yarn add react-hot-loader`
 
 ## ESLint
 
@@ -151,26 +156,8 @@ Run `yarn add eslint --dev` and `yarn run eslint --init` to install ESLint
 
 Add this script `"lint": "eslint src --ext .js --fix"` to `package.json`
 
-## Material-UI
+## Prettier
 
-Run `yarn add @material-ui/core`
+Run `yarn add eslint-config-prettier eslint-plugin-prettier prettier --dev` to install Prettier
 
-Add Roboto Font and Font icons
-
-```html
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-/>
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/icon?family=Material+Icons"
-/>
-```
-
-Add SVG Icons `yarn add @material-ui/icons`
-
-In App.css update the font
-
-Also do this "Setup de um tema central inicializado na base de renderização do app
-Uso de um hook de estilo como exemplo (pode ser um componente básico como button)"
+In `.eslintrc.json` add `"plugin:prettier/recommended"` inside extends.

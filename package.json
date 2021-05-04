@@ -1,8 +1,8 @@
 {
-  "name": "base-react-and-material",
+  "name": "base-react",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "git@github.com:vicio-code/base-react-and-material.git",
+  "repository": "git@github.com:vicio-code/base-react.git",
   "author": "lucca-falbo <luccafalbo@gmail.com>",
   "license": "MIT",
   "devDependencies": {
